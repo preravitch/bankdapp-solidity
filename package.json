@@ -17,7 +17,8 @@
     "bootstrap": "^3.4.1",
     "hardhat": "^2.9.9",
     "openzeppelin-solidity": "^4.6.0",
-    "react-bootstrap": "^2.4.0"
+    "react-bootstrap": "^2.4.0",
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-waffle": "^2.0.3",

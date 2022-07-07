@@ -7,7 +7,7 @@ async function main() {
     const Usdt = await ethers.getContractFactory("Usdt", signer2);
     const usdt = await Usdt.deploy();
 
-    await bankContract.getAddress(
+    await bankContract.getUsdtAddress(
         usdt.address
       );
   

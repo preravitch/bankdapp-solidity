@@ -1,10 +1,12 @@
 import './App.css';
 import { ethers } from 'ethers';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import bankArtifact from './artifacts/contracts/Bank.sol/Bank.json';
 import usdtArtifact from './artifacts/contracts/Usdt.sol/Usdt.json';
-import Createaccount from './createaccount';
+import CreateAccount from './CreateAccount';
+import AccountList from './AccountList';
+
 function App() {
   const [provider, setProviders] = useState(undefined);
   const [signer, setSigner] = useState(undefined);
@@ -12,11 +14,14 @@ function App() {
   const [bankContract, setBankContract] = useState(undefined);
   const [usdtContract, setusdtContract] = useState(undefined);
   const [tokenSymbols, setTokenSymbols] = useState(undefined);
+  const [changed, setChanged] = useState(false);
+  const [createclicked, setcreateclicked] = useState(false);
 
   const [amount, setAmount] = useState(0);
-  const [showModel, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
   const [selectedSymbol, setSelectedSymbol] = useState(undefined);
   const [isDeposit, setIsDeposit] = useState(undefined);
+  const [account, setAccount] = useState([]);
 
   const toBytes32 = text => ( ethers.utils.formatBytes32String(text) );
   const toString = bytes32 => ( ethers.utils.parseBytes32String(bytes32) );
@@ -29,16 +34,26 @@ function App() {
       const provider = await new ethers.providers.Web3Provider(window.ethereum)
       setProviders(provider)
 
-      const bankContract = await new ethers.Contract("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", bankArtifact.abi)
+      const bankContract = await new ethers.Contract("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0", bankArtifact.abi)
       setBankContract(bankContract)
-
-      
+        
     }
     init();
   }, [])
+
   console.log(bankContract);
   const isConnected = () => (signer !== undefined)
+  const isCreated = () => (createclicked == false)
   
+  const clickcreate = function () {
+    setcreateclicked(true);
+  }
+  const created =  function () {
+    setTimeout(function(){
+      setcreateclicked(false);
+    },30000)
+    
+  }
   const getSigner = async provider => {
     provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
@@ -58,6 +73,33 @@ function App() {
       }) 
   }
 
+  const getUsdtContract = async (bankContract, provider) => {
+    const address = await bankContract.connect(provider).getUsdtAddress()
+    const UsdtContract = new ethers.Contract(address, usdtArtifact.abi)
+    return UsdtContract
+  }
+  console.log(changed);
+  const getAllAccount = useCallback(
+    async function () {
+      console.log(await bankContract.connect(signer).userAccounts());
+      const allAcc = await bankContract.connect(signer).userAccounts();
+      console.log(allAcc);
+      setAccount(allAcc);
+      return allAcc;
+    },
+    [bankContract, signer]
+  );
+
+  useEffect(() => {
+    if (changed) {getAllAccount()};
+  }, [changed, getAllAccount]);
+
+  const changedHandler = function () {
+    
+      setChanged(true);
+    
+  };
+
   const depositUsdt = (wei, account) => {
     const usdtContract = 
     usdtContract.connect(signer).approve(bankContract.address, wei)
@@ -66,23 +108,24 @@ function App() {
       })
   }
 
-  const createaccount = (account) =>  {
-    bankContract.connect(signer).createnewaccount(account);
-  }
+  const createAccount = function (_accountname) {
+    bankContract.connect(signer).createnewaccount(_accountname);
+    created();
+  };
 
-  const withdrawUsdt = (wei, account) => {
-    bankContract.connect(signer).withdrawUsdt(wei, account);
+  
+  const withdrawUsdt = (wei, accountname) => {
+    bankContract.connect(signer).withdrawUsdt(wei, accountname);
   }
-
-  const despoitorwithdraw = (e, symbol) => {
+  const depositOrWithdraw = (e, symbol) => {
     e.preventDefault();
     const wei = toWei(amount)
 
-   /* if(isDeposit) {
+    if(isDeposit) {
       depositUsdt(wei, symbol)
     } else {
-      withdrawUsdt
-    }*/
+      withdrawUsdt(wei, symbol)
+    }
   }
   return (
     <div className="App">
@@ -92,7 +135,26 @@ function App() {
             <p>
               Welcome  {signerAddress?.substring(0,10)}...
             </p>
-              <Createaccount></Createaccount>
+            <button onClick={getAllAccount} className="btn btn-default"> Refresh Data</button>
+             <p>
+               Accounts
+            
+              </p>
+              <div>
+                <AccountList account={account}/>
+              </div>
+
+            {isCreated() ? (
+                <button onClick={clickcreate} className="button">Create New Account</button>
+              
+            ) : (
+              <CreateAccount 
+                change={ changedHandler } 
+                createAccount={ createAccount }>
+              </CreateAccount>
+            )
+            }
+            
           </div>
         )  : (
           <div>

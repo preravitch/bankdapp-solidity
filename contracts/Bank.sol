@@ -4,10 +4,12 @@ pragma solidity ^0.8.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
-
+import "hardhat/console.sol";
 contract Bank {
     address owner;
     address public Usdt;
+
+    event showname(string _Name, address owner);
 
     constructor() {
     owner = msg.sender;
@@ -24,19 +26,17 @@ contract Bank {
     }
 
     BankAccont[] public Accounts;
-    mapping(address => mapping(string => BankAccont)) public AccountDetails;
-    mapping(address => BankAccont) public accountwallet;
 
     function userAccounts() public view returns (BankAccont[] memory) {
-        BankAccont[] memory myaccount = new BankAccont[](Accounts.length);
+        BankAccont[] memory userdetail = new BankAccont[](Accounts.length);
         uint count = 0;
         for (uint i = 0; i < Accounts.length; i++) {
             if (Accounts[i].owner == msg.sender) {
-                myaccount[count] = Accounts[i];
+                userdetail[count] = Accounts[i];
                 count++;
             }
         }
-        return myaccount;
+        return userdetail;
     }
 
     function userAccountsdetails() public view returns (BankAccont[] memory) {
@@ -52,8 +52,9 @@ contract Bank {
     }
 
     function createnewaccount(string memory _accountname) public {
-        BankAccont memory newAccount = BankAccont (_accountname, 0, msg.sender);
+        BankAccont memory newAccount = BankAccont (_accountname, 1, msg.sender);
         Accounts.push(newAccount);
+        emit showname(newAccount.name, msg.sender);
     }
 
     function compareStringsbyBytes(string memory s1, string memory s2) public pure returns(bool){
@@ -70,7 +71,7 @@ contract Bank {
         return balance;
     }
 
-    function depositeUsdt(string memory _accountname, uint _amount) external {
+    function depositUsdt(string memory _accountname, uint _amount) external {
        uint index;
        for (uint i = 0; i < Accounts.length; i++) {
             if (compareStringsbyBytes(Accounts[i].name,_accountname)) {

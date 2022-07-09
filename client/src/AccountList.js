@@ -3,10 +3,11 @@ import { ethers } from 'ethers';
 
 const AccountList = function (props) {
     const toEther = wei => ( ethers.utils.formatEther(wei).toString());
+    const toNum = max => ( ethers.BigNumber.from(max).toNumber());
     const modAcc = props.account.map(acc => {
         return {
           name: acc[0],
-          address: acc[2]
+          balance: toEther(acc[1])
         }
       })
       

@@ -52,7 +52,7 @@ contract Bank {
     }
 
     function createnewaccount(string memory _accountname) public {
-        BankAccont memory newAccount = BankAccont (_accountname, 1, msg.sender);
+        BankAccont memory newAccount = BankAccont (_accountname, 0, msg.sender);
         Accounts.push(newAccount);
         emit showname(newAccount.name, msg.sender);
     }

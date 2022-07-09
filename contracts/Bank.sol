@@ -25,7 +25,7 @@ contract Bank {
 
     struct BankAccont {
         string name;
-        uint   balance;
+        uint256   balance;
         address owner;
     }
 
@@ -40,19 +40,11 @@ contract Bank {
                 count++;
             }
         }
-        return userdetail;
-    }
-
-    function userAccountsdetails() public view returns (BankAccont[] memory) {
-        BankAccont[] memory myaccount = new BankAccont[](Accounts.length);
-        uint count = 0;
-        for (uint i = 0; i < Accounts.length; i++) {
-            if (Accounts[i].owner == msg.sender) {
-                myaccount[count] = Accounts[i];
-                count++;
-            }
+        BankAccont[] memory temp = new BankAccont[](count);
+        for (uint j = 0; j < count; j++) {
+            temp[j] = userdetail[j];
         }
-        return myaccount;
+        return temp;
     }
 
     function createnewaccount(string memory _accountname) public {
@@ -65,8 +57,8 @@ contract Bank {
     return keccak256(abi.encodePacked(s1)) == keccak256(abi.encodePacked(s2));
     }
 
-    function getBalance(string memory _accountname) public view returns(uint) {
-       uint balance;
+    function getBalance(string memory _accountname) public view returns(uint256) {
+       uint256 balance;
        for (uint i = 0; i < Accounts.length; i++) {
             if (compareStringsbyBytes(Accounts[i].name,_accountname)) {
                 balance = Accounts[i].balance;
@@ -75,7 +67,7 @@ contract Bank {
         return balance;
     }
 
-    function depositUsdt(string memory _accountname, uint _amount) external {
+    function depositUsdt(string memory _accountname, uint256 _amount) external {
        uint index;
        for (uint i = 0; i < Accounts.length; i++) {
             if (compareStringsbyBytes(Accounts[i].name,_accountname)) {
@@ -86,7 +78,7 @@ contract Bank {
        IERC20(Usdt).transferFrom(msg.sender, address(this), _amount);
     }
 
-    function withdrawUsdt(uint _amount, string memory _accountname) public {
+    function withdrawUsdt(uint256 _amount, string memory _accountname) public {
         uint index;
         for (uint i = 0; i < Accounts.length; i++) {
             if (compareStringsbyBytes(Accounts[i].name,_accountname)) {
@@ -99,7 +91,7 @@ contract Bank {
         IERC20(Usdt).transfer(msg.sender, _amount);
     }
 
-    function transferUsdt(string memory _accountfrom, string memory _accountto, uint _amount) public {
+    function transferUsdt(string memory _accountfrom, string memory _accountto, uint256 _amount) public {
         uint from;
         uint to;
         for (uint i = 0; i < Accounts.length; i++) {

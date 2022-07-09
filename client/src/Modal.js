@@ -1,50 +1,74 @@
-import React from 'react';
+import { useRef } from "react";
+import { ethers } from 'ethers';
 import './Modal.css'
 
-const buttonStyle = {
-    width: "100%",
-};
+const toWei = ether => ( ethers.utils.parseEther(ether) );
 
 const Modal = props => {
+  const amountRef =useRef();
+  const submitHandlerdeposit = function (e) {
+    e.preventDefault();
+    const amount = amountRef.current.value
+    const wei = toWei(amount)
+    props.deposit(wei, props.account)
+  };
+
+  const submitHandlerwithdraw = function (e) {
+    e.preventDefault();
+    const amount = amountRef.current.value
+    const wei = toWei(amount)
+    props.deposit(wei, props.account)
+  };
   if (!props.show) {
     return null
   }
 
   return(
-    <div className="modaly" onClick={props.onClose}>
+    <div className="modaly" onClick={ props.onClose }>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">{props.symbol.toUpperCase()}</h2>
+          <h2 className="modal-title">Account: {props.account}</h2>
         </div>
         <div className="modal-body">
 
-          <form onSubmit={e => props.depositOrWithdraw(e, props.symbol)}>
-
+          <form>
             <div className="row">
-              <div className="col-md-3">
-                <label>Amount</label>
+              <div className='col-md-4'>
+                <label>Balance: </label> 
               </div>
-              <div className="col-md-8">
-                <input style={{width: "300px"}} onChange={e => props.setAmount(e.target.value)}/>
+              <div className='col-md-5'>
+                <label> {props.balance} </label>
+              </div>
+              <div className='col-md-2'>
+                <label>Usdt </label> 
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <label>Amount:</label>
+              </div>
+              <div className="col-md-5">
+                <input style={{width: "230px"}} type="text" ref={amountRef} />
+              </div>
+              <div className="col-md-2">
+                <label>Usdt</label>
               </div>
             </div>
 
             <div className="row">
-              <div className="col-md-3">
-              </div>
-              <div className="col-md-4">
-                <button style={{width: "100%"}} onClick={ e => props.setIsDeposit(true) } className="btn btn-primary">Deposit</button>
-              </div>
-              <div className="col-md-4">
-                <button style={{width: "100%"}} onClick={ e => props.setIsDeposit(false) } className="btn btn-primary">Withdraw</button>
-              </div>
+              
             </div>
           </form>
 
         </div>
 
         <div className="modal-footer">
-          <button style={{marginRight: "42px"}} onClick={ props.onClose } className="btn btn-primary">Close</button>
+          <div className="col-md-5">
+                <button style={{width: "150px"}} onClick={ submitHandlerdeposit } className="btn btn-primary">Deposit</button>
+              </div>
+              <div className="col-md-5">
+                <button style={{width: "150px"}} onClick={ submitHandlerwithdraw } className="btn btn-primary">Withdraw</button>
+              </div>
         </div>
       </div>
     </div>

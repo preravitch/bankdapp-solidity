@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback } from 'react';
 import bankArtifact from './artifacts/contracts/Bank.sol/Bank.json';
 import usdtArtifact from './artifacts/contracts/Usdt.sol/Usdt.json';
 import CreateAccount from './CreateAccount';
+import Modal from './Modal';
+import TransferModal from './TransferModal'
 import { Button } from 'react-bootstrap';
 
 
@@ -14,12 +16,18 @@ function App() {
   const [signerAddress, setSignerAddress] = useState(undefined);
   const [bankContract, setBankContract] = useState(undefined);
   const [usdtContract, setusdtContract] = useState(undefined);
-  const [changed, setChanged] = useState(false);
   const [createclicked, setcreateclicked] = useState(false);
 
   const [amount, setAmount] = useState(0);
-  const [isDeposit, setIsDeposit] = useState(undefined);
+  const [isDeposit, setIsDeposit] = useState(true);
   const [account, setAccount] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState(undefined);
+  const [selectedBalance, setBalance] = useState(undefined);
+  const [showCreate, setshowCreate] = useState(false);
+
+  
 
   const toBytes32 = text => ( ethers.utils.formatBytes32String(text) );
   const toString = bytes32 => ( ethers.utils.parseBytes32String(bytes32) );
@@ -33,23 +41,23 @@ function App() {
       const provider = await new ethers.providers.Web3Provider(window.ethereum)
       setProviders(provider)
 
-      const bankContract = await new ethers.Contract("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9", bankArtifact.abi)
+      const bankContract = await new ethers.Contract("0x610178dA211FEF7D417bC0e6FeD39F05609AD788", bankArtifact.abi)
       setBankContract(bankContract)
+      getUsdtContract(bankContract, provider);
     }
     init();
   }, [])
 
   console.log(bankContract);
   const isConnected = () => (signer !== undefined)
-  const isCreated = () => (createclicked == false)
   
   const clickcreate = function () {
-    setcreateclicked(true);
+    setshowCreate(true);
   }
   const created =  function () {
     setTimeout(function(){
       setcreateclicked(false);
-    },30000)
+    },8000)
     
   }
   const getSigner = async provider => {
@@ -68,35 +76,38 @@ function App() {
     getSigner(provider)
       .then(signer => {
         setSigner(signer)
-      }) 
+      })
+    
   }
 
   const getUsdtContract = async (bankContract, provider) => {
-    const address = await bankContract.connect(provider).getUsdtAddress()
+    const address = await bankContract.connect(provider).UsdtAddress()
     const UsdtContract = new ethers.Contract(address, usdtArtifact.abi)
-    return UsdtContract
+    setusdtContract(UsdtContract)
   }
-  console.log(changed);
+  
   const getAllAccount = useCallback(
     async function () {
-      console.log(await bankContract.connect(signer).userAccounts());
       const allAcc = await bankContract.connect(signer).userAccounts();
-      console.log(allAcc);
+      console.log(allAcc)
       setAccount(allAcc);
+      connect();
       return allAcc;
     },
     [bankContract, signer]
   );
 
-  useEffect(() => {
-    if (changed) {getAllAccount()};
-  }, [changed, getAllAccount]);
+  const displayModal = (account, balance) => {
+    setSelectedAccount(account)
+    setBalance(balance)
+    setShowModal(true)
+  }
 
-  const changedHandler = function () {
-    
-      setChanged(true);
-    
-  };
+  const displayTransferModal = (account, balance) => {
+    setSelectedAccount(account)
+    setBalance(balance)
+    setShowTransferModal(true)
+  }
 
   const AccountList = function (props) {
     const modAcc = props.account.map(acc => {
@@ -110,76 +121,124 @@ function App() {
     console.log(accarr);
     const html = accarr.map(acc => {
 
-        return  <p>Account Name: {acc.name}
-                    <p>
-                        Balance: {acc.balance} Usdt
-                    </p>
-                    <button onClick={clickcreate} className="btn btn-default">Deposite/Withdraw</button>
-                    <button onClick={clickcreate} className="btn btn-default">Transfer</button>
-                </p>
+        return(
+
+              <div className="modal-content">
+                <div className='modal-body'>
+                  <div className="row">
+                    <div className='col-md-4'>
+                      <label> Account: </label>
+                    </div>
+                    <div className='col-md-4'>
+                      <label> {acc.name} </label>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className='col-md-4'>
+                      <label> Balance: </label>
+                    </div>
+                    <div className='col-md-5'>
+                      <label> {acc.balance} Usdt</label>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className='col-md-6'>
+                      <button style={{width: "150px"}} onClick={ () => displayModal(acc.name, acc.balance) } className="btn btn-primary">Deposit/Withdraw</button>
+                    </div>
+                    <div className='col-md-6'>
+                      <button style={{width: "150px"}} onClick={() => displayTransferModal(acc.name, acc.balance)} className="btn btn-primary">Transfer</button>
+                      <Modal
+                            show={showModal}
+                            onClose={() => setShowModal(false)}
+                            account={selectedAccount}
+                            balance={selectedBalance}
+                            deposit={depositUsdt}
+                            withdraw={withdrawUsdt}
+                          />
+                      <TransferModal
+                            transfer={ transferUsdt }
+                            show={showTransferModal}
+                            onClose={() => setShowTransferModal(false)}
+                            account={selectedAccount}
+                            balance={selectedBalance}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+        )
               
     })
     return html;
 }
 
+
+  const createAccount = (_accountname) => {
+    bankContract.connect(signer).createnewaccount(_accountname);
+    created();
+    getAllAccount();
+  };
+
   const depositUsdt = (wei, account) => {
-    const usdtContract = 
     usdtContract.connect(signer).approve(bankContract.address, wei)
       .then(() => {
-        bankContract.connect(signer).depositUsdt(wei, account);
+        bankContract.connect(signer).depositUsdt(account, wei);
       })
   }
 
-  const createAccount = function (_accountname) {
-    bankContract.connect(signer).createnewaccount(_accountname);
-    created();
-  };
-
-  
   const withdrawUsdt = (wei, accountname) => {
     bankContract.connect(signer).withdrawUsdt(wei, accountname);
   }
-  const depositOrWithdraw = (e, symbol) => {
+
+  const depositOrWithdraw = (e, accountname) => {
     e.preventDefault();
     const wei = toWei(amount)
 
     if(isDeposit) {
-      depositUsdt(wei, symbol)
+      depositUsdt(wei, accountname)
     } else {
-      withdrawUsdt(wei, symbol)
+      withdrawUsdt(wei, accountname)
     }
   }
+
+  const transferUsdt = (from, to, wei) => {
+    bankContract.connect(signer).transferUsdt(from, to, wei);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         {isConnected() ? (
           <div>
-            <p>
-              Welcome  {signerAddress?.substring(0,10)}...
-            </p>
-            <button onClick={getAllAccount} className="btn btn-default"> Refresh Data</button>
-             <p>
-               Accounts
-            
-              </p>
+            <div className='modal-content'>
+              <label>Welcome  {signerAddress?.substring(0,5)}... {signerAddress?.substring(37,42)}</label>
+            </div>
+             <div className="modal-content">
+                <label>Accounts</label>
+              </div>
               <div>
                 <AccountList account={account}/>
               </div>
 
-            {isCreated() ? (
-                <button onClick={clickcreate} className="btn btn-default">Create New Account</button>
+            {showCreate ? (
+                  <CreateAccount 
+                    createAccount={ createAccount }
+                    onClose={() => setshowCreate(false)}
+                  />
               
             ) : (
-              <CreateAccount 
-                change={ changedHandler } 
-                createAccount={ createAccount }>
-              </CreateAccount>
+              
+                  
+                <button onClick={clickcreate} className="btn btn-default">Create New Account</button>
             )
             }
-            
+            <div className='row'>
+            <button onClick={getAllAccount} className="btn btn-default"> Refresh Data</button>
+            </div>
           </div>
         )  : (
-          <div>
+          <div className="modal-content">
             <p>
               You are not connected
             </p>

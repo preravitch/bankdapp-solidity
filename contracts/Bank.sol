@@ -14,9 +14,13 @@ contract Bank {
     constructor() {
     owner = msg.sender;
   }
-    function getUsdtAddress(address UsdtAddress) external {
+    function getUsdtAddress(address _UsdtAddress) external {
         require(msg.sender == owner, "No Permission");
-        Usdt = UsdtAddress;
+        Usdt = _UsdtAddress;
+    }
+
+    function UsdtAddress() external view returns(address) {
+        return Usdt;
     }
 
     struct BankAccont {

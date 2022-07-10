@@ -6,7 +6,8 @@ import bankArtifact from './artifacts/contracts/Bank.sol/Bank.json';
 import usdtArtifact from './artifacts/contracts/Usdt.sol/Usdt.json';
 import CreateAccount from './CreateAccount';
 import Modal from './Modal';
-import TransferModal from './TransferModal'
+import TransferModal from './TransferModal';
+import ListTransfer from './ListTransfer';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
   const [selectedAccount, setSelectedAccount] = useState(undefined);
   const [selectedBalance, setBalance] = useState(undefined);
   const [showCreate, setshowCreate] = useState(false);
+  const [showListTransfer, setshowListTransfer] = useState(false);
 
   const toEther = wei => ( ethers.utils.formatEther(wei).toString());
 
@@ -30,7 +32,7 @@ function App() {
       const provider = await new ethers.providers.Web3Provider(window.ethereum)
       setProviders(provider)
 
-      const bankContract = await new ethers.Contract("0x5FbDB2315678afecb367f032d93F642f64180aa3", bankArtifact.abi)
+      const bankContract = await new ethers.Contract("0x0165878A594ca255338adfa4d48449f69242Eb8F", bankArtifact.abi)
       setBankContract(bankContract)
       getUsdtContract(bankContract, provider);
     }
@@ -92,8 +94,8 @@ function App() {
     setShowTransferModal(true)
   }
 
-  const AccountList = function (props) {
-    const modAcc = props.account.map(acc => {
+  const AccountList = function () {
+    const modAcc = account.map(acc => {
         return {
           name: acc[0],
           balance: toEther(acc[1])
@@ -142,6 +144,14 @@ function App() {
                             transfer={ transferUsdt }
                             show={showTransferModal}
                             onClose={() => setShowTransferModal(false)}
+                            openlistran={() => {setshowListTransfer(true);setShowTransferModal(false)}}
+                            account={selectedAccount}
+                            balance={selectedBalance}
+                      />
+                      <ListTransfer
+                            listtransfer= { listtransfer }
+                            show={showListTransfer}
+                            onClose={() => setshowListTransfer(false)}
                             account={selectedAccount}
                             balance={selectedBalance}
                       />
@@ -155,7 +165,6 @@ function App() {
     })
     return html;
 }
-
 
   const createAccount = (_accountname) => {
     bankContract.connect(signer).createnewaccount(_accountname);
@@ -181,6 +190,11 @@ function App() {
     getAllAccount();
   }
 
+  const listtransfer = (from, tolist, wei) => {
+    bankContract.connect(signer).listtransfer(from, tolist, wei);
+    getAllAccount();
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -196,18 +210,19 @@ function App() {
                 <AccountList account={account}/>
               </div>
 
-            {showCreate ? (
-                  <CreateAccount 
+              <button onClick={clickcreate} className="create-navlink button">Create New Account</button>
+                  <CreateAccount
+                    show={showCreate}
                     createAccount={ createAccount }
                     onClose={() => setshowCreate(false)}
                   />
               
-            ) : (
+            
               
                   
-                <button onClick={clickcreate} className="btn btn-default">Create New Account</button>
-            )
-            }
+                
+            
+            
             <div className='row'>
             <button onClick={getAllAccount} className="btn btn-default"> Refresh Data</button>
             </div>

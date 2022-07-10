@@ -12,8 +12,11 @@ const CreateAccount = function (props) {
     e.preventDefault();
     const account = accountRef.current.value;
     props.createAccount(account);
-    props.change();
+    setValue('');
   };
+  if (!props.show) {
+    return null
+  }
 
   return (
     <div className="modaly" onClick={props.onClose}>

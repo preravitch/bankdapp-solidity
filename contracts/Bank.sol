@@ -93,7 +93,7 @@ contract Bank {
 
     function transferUsdt(string memory _accountfrom, string memory _accountto, uint256 _amount) public {
         uint from;
-        uint to;
+        uint to = 100000000000000000;
         for (uint i = 0; i < Accounts.length; i++) {
             if (compareStringsbyBytes(Accounts[i].name, _accountfrom)) {
                 from = i;
@@ -101,6 +101,7 @@ contract Bank {
                 to = i;
             }
         }
+        require(to != 100000000000000000, "account not exist");
         require(Accounts[from].balance >= _amount, "not enough funds");
         
         Accounts[from].balance -= _amount;
@@ -111,4 +112,9 @@ contract Bank {
         Accounts[to].balance += _amount;
     }
 
+    function listtransfer(string memory _from, string[] memory listto, uint eachamount) public {
+        for (uint i = 0; i < listto.length; i++) {
+            transferUsdt(_from, listto[i], eachamount);
+        }
+    }
 }

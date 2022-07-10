@@ -24,4 +24,13 @@
   color: rgb(12, 7, 7);
 }
 
+.create-navlink {
+  width: 600px;
+  height: 200px;
+  font-size: 30px;
+  text-align: center;
+  padding-top: px;
+  border-style: dashed;
+  text-decoration: none;
+}
 

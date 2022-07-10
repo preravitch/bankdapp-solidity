@@ -404,8 +404,8 @@
       ]
     },
     "C:\\Programming\\Solidity\\bankdapp-solidity\\contracts\\Bank.sol": {
-      "lastModificationDate": 1657383870426,
-      "contentHash": "6ea94eb199ac5e85687aacb603b64487",
+      "lastModificationDate": 1657449661105,
+      "contentHash": "2aea40dc532503e4a4e44f93e6ad1c0b",
       "sourceName": "contracts/Bank.sol",
       "solcConfig": {
         "version": "0.8.0",

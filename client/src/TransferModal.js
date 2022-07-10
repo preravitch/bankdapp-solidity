@@ -92,9 +92,12 @@ const TransferModal = function (props) {
           </div>
         </div>
         <div className="modal-footer">
-                    <div className='col-md-8'>
-                        <button disabled={!value1 || !value2} style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Transfer</button>
-        </div>
+          <div className="col-md-4">
+          <button style={{width: "150px"}} onClick={props.openlistran} className="btn btn-primary">List Transfer</button>
+          </div>
+          <div className='col-md-8'>
+            <button disabled={!value1 || !value2} style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Transfer</button>
+          </div>
         </div>    
       </div>
     </div>

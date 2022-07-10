@@ -13,6 +13,8 @@
   .modal-content {
     background-color: #fff;
     width: 600px !important;
+    font-size: 30px;
+    padding-top: 10px;
   }
   
   .modal-title {
@@ -20,6 +22,7 @@
   }
 
   .modal-fee{
-    font-size: 20px;
+    padding-top: 10px;
+    font-size: 15px;
     color: rgb(174, 89, 20);
   }

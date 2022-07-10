@@ -1,8 +1,12 @@
+import React from 'react';
 import { useRef } from "react";
-import styles from "./CreateAccount.module.css";
 import './Modal.css'
 
 const CreateAccount = function (props) {
+  const [value, setValue] = React.useState('');
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
   const accountRef = useRef();
   const submitHandler = function (e) {
     e.preventDefault();
@@ -20,12 +24,12 @@ const CreateAccount = function (props) {
         <div className='modal-body'>
           <form>
             <label >Account Name</label>
-            <input  ref={accountRef} />
+            <input  type='text' ref={accountRef} value={value}  onChange={handleChange}/>
           </form>
         </div>
         <div className="modal-footer">
                     <div className='col-md-8'>
-                    <button style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Create</button>
+                    <button disabled={!value} style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Create</button>
                     </div>
           
         </div>    

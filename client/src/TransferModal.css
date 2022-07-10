@@ -18,3 +18,8 @@
   .modal-title {
     margin: auto;
   }
+
+  .modal-fee{
+    font-size: 20px;
+    color: rgb(174, 89, 20);
+  }

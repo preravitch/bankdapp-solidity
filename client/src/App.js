@@ -7,19 +7,15 @@ import usdtArtifact from './artifacts/contracts/Usdt.sol/Usdt.json';
 import CreateAccount from './CreateAccount';
 import Modal from './Modal';
 import TransferModal from './TransferModal'
-import { Button } from 'react-bootstrap';
 
 
 function App() {
+
   const [provider, setProviders] = useState(undefined);
   const [signer, setSigner] = useState(undefined);
   const [signerAddress, setSignerAddress] = useState(undefined);
   const [bankContract, setBankContract] = useState(undefined);
   const [usdtContract, setusdtContract] = useState(undefined);
-  const [createclicked, setcreateclicked] = useState(false);
-
-  const [amount, setAmount] = useState(0);
-  const [isDeposit, setIsDeposit] = useState(true);
   const [account, setAccount] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -27,21 +23,14 @@ function App() {
   const [selectedBalance, setBalance] = useState(undefined);
   const [showCreate, setshowCreate] = useState(false);
 
-  
-
-  const toBytes32 = text => ( ethers.utils.formatBytes32String(text) );
-  const toString = bytes32 => ( ethers.utils.parseBytes32String(bytes32) );
-  const toWei = ether => ( ethers.utils.parseEther(ether) );
   const toEther = wei => ( ethers.utils.formatEther(wei).toString());
-  const toRound = num => ( Number(num).toFixed(2) );
-  const toNum = max => ( ethers.BigNumber.from(max).toNumber());
 
   useEffect(() => {
     const init = async () => {
       const provider = await new ethers.providers.Web3Provider(window.ethereum)
       setProviders(provider)
 
-      const bankContract = await new ethers.Contract("0x610178dA211FEF7D417bC0e6FeD39F05609AD788", bankArtifact.abi)
+      const bankContract = await new ethers.Contract("0x5FbDB2315678afecb367f032d93F642f64180aa3", bankArtifact.abi)
       setBankContract(bankContract)
       getUsdtContract(bankContract, provider);
     }
@@ -53,12 +42,6 @@ function App() {
   
   const clickcreate = function () {
     setshowCreate(true);
-  }
-  const created =  function () {
-    setTimeout(function(){
-      setcreateclicked(false);
-    },8000)
-    
   }
   const getSigner = async provider => {
     provider.send("eth_requestAccounts", []);
@@ -176,7 +159,6 @@ function App() {
 
   const createAccount = (_accountname) => {
     bankContract.connect(signer).createnewaccount(_accountname);
-    created();
     getAllAccount();
   };
 
@@ -184,26 +166,19 @@ function App() {
     usdtContract.connect(signer).approve(bankContract.address, wei)
       .then(() => {
         bankContract.connect(signer).depositUsdt(account, wei);
+        getAllAccount();
       })
   }
 
   const withdrawUsdt = (wei, accountname) => {
     bankContract.connect(signer).withdrawUsdt(wei, accountname);
+    getAllAccount();
   }
 
-  const depositOrWithdraw = (e, accountname) => {
-    e.preventDefault();
-    const wei = toWei(amount)
-
-    if(isDeposit) {
-      depositUsdt(wei, accountname)
-    } else {
-      withdrawUsdt(wei, accountname)
-    }
-  }
 
   const transferUsdt = (from, to, wei) => {
     bankContract.connect(signer).transferUsdt(from, to, wei);
+    getAllAccount();
   }
 
   return (

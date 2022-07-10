@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRef } from "react";
 import { ethers } from 'ethers';
 import './Modal.css'
@@ -5,6 +6,10 @@ import './Modal.css'
 const toWei = ether => ( ethers.utils.parseEther(ether) );
 
 const Modal = props => {
+  const [value, setValue] = React.useState('');
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
   const amountRef =useRef();
   const submitHandlerdeposit = function (e) {
     e.preventDefault();
@@ -48,7 +53,14 @@ const Modal = props => {
                 <label>Amount:</label>
               </div>
               <div className="col-md-5">
-                <input style={{width: "230px"}} type="text" ref={amountRef} />
+                <input 
+                  style={{width: "230px"}} 
+                  type="text" 
+                  ref={amountRef} 
+                  value={value}  
+                  onChange={handleChange}
+                  onKeyPress={e => {!/[0-9]/.test(e.key) && e.preventDefault()}}
+                />
               </div>
               <div className="col-md-2">
                 <label>Usdt</label>
@@ -64,10 +76,10 @@ const Modal = props => {
 
         <div className="modal-footer">
           <div className="col-md-5">
-                <button style={{width: "150px"}} onClick={ submitHandlerdeposit } className="btn btn-primary">Deposit</button>
+                <button disabled={!value} style={{width: "150px"}} onClick={ submitHandlerdeposit } className="btn btn-primary">Deposit</button>
               </div>
               <div className="col-md-5">
-                <button style={{width: "150px"}} onClick={ submitHandlerwithdraw } className="btn btn-primary">Withdraw</button>
+                <button disabled={!value} style={{width: "150px"}} onClick={ submitHandlerwithdraw } className="btn btn-primary">Withdraw</button>
               </div>
         </div>
       </div>

@@ -1,11 +1,21 @@
+import React from 'react';
 import { useRef } from "react";
 import { ethers } from 'ethers';
-import styles from "./CreateAccount.module.css";
 import './TransferModal.css'
 
 const toWei = ether => ( ethers.utils.parseEther(ether) );
 
 const TransferModal = function (props) {
+  const [value1, setValue1] = React.useState('');
+  const handleChange1 = (event) => {
+    setValue1(event.target.value);
+  };
+
+  const [value2, setValue2] = React.useState('');
+  const handleChange2 = (event) => {
+    setValue2(event.target.value);
+  };
+
   const amountRef = useRef();
   const toaccountRef = useRef();
   const submitHandler = function (e) {
@@ -51,7 +61,10 @@ const TransferModal = function (props) {
                         <label>to Account:</label>
                     </div>
                     <div className='col-md-3'>
-                        <input type="text" style={{width: "270px"}} ref={toaccountRef} />
+                        <input type="text" style={{width: "270px"}} ref={toaccountRef} 
+                               value={value1}  
+                               onChange={handleChange1}
+                        />
                     </div>
             </div>
             <div className="row">
@@ -59,21 +72,28 @@ const TransferModal = function (props) {
                         <label>Amount:</label>
                     </div>
                     <div className='col-md-4'>
-                        <input style={{width: "200px"}} type="text" ref={amountRef} />
-                        
+                        <input 
+                          style={{width: "200px"}} 
+                          type="text" 
+                          ref={amountRef}
+                          value={value2}  
+                          onChange={handleChange2}
+                          onKeyPress={e => {!/[0-9]/.test(e.key) && e.preventDefault()}}
+                        />
                     </div>
                     <div className='col-md-3'>
                         <label>Usdt</label>
                     </div>
-                    
             </div>
-            
           </form>
+          <div className="modal-fee">
+            <p> 1% fee, if you transfer to account in other wallet </p>
+            <p> No fee, if you transfer to account in this wallet</p>
+          </div>
+        </div>
         <div className="modal-footer">
                     <div className='col-md-8'>
-                        <button style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Transfer</button>
-                    </div>
-            
+                        <button disabled={!value1 || !value2} style={{width: "150px"}} onClick={submitHandler} className="btn btn-primary">Transfer</button>
         </div>
         </div>    
       </div>

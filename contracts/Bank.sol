@@ -1,10 +1,9 @@
-//SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
-import "hardhat/console.sol";
+
 contract Bank {
     address owner;
     address public Usdt;
@@ -35,9 +34,13 @@ contract Bank {
     function compareStringsbyBytes(string memory s1, string memory s2) public pure returns(bool){
     return keccak256(abi.encodePacked(s1)) == keccak256(abi.encodePacked(s2));
     }
+
+    function notequalStringsbyBytes(string memory s1, string memory s2) public pure returns(bool){
+    return keccak256(abi.encodePacked(s1)) != keccak256(abi.encodePacked(s2));
+    }
     function createnewaccount(string memory _accountname) public {
         for (uint i = 0; i <Accounts.length; i++) {
-            require(compareStringsbyBytes(Accounts[i].name,_accountname), "account name had been used");
+            require(notequalStringsbyBytes(Accounts[i].name,_accountname), "account name had been used");
         }
         BankAccont memory newAccount = BankAccont (_accountname, 0, msg.sender);
         Accounts.push(newAccount);

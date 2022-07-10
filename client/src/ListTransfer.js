@@ -24,7 +24,6 @@ const ListTransfer = function (props) {
         const name = nameRef.current.value;
         setlistname(oldArray => [...oldArray,name] );
         setValue1('');
-        console.log(listname);
     }
     const clearlist = function (e) {
         e.preventDefault();
@@ -48,7 +47,7 @@ const ListTransfer = function (props) {
                 <label className="modal-title"> List Transfer Usdt</label>
             </div>
             <div className='modal-body'>
-              <form>
+              <form onSubmit={addnameHandler}>
                 <div className="row">
                         <div className='col-md-5'>
                             <label> Account: </label>

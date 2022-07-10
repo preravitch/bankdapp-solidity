@@ -29,22 +29,18 @@ function App() {
 
   useEffect(() => {
     const init = async () => {
-      const provider = await new ethers.providers.Web3Provider(window.ethereum)
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
       setProviders(provider)
 
-      const bankContract = await new ethers.Contract("0x0165878A594ca255338adfa4d48449f69242Eb8F", bankArtifact.abi)
+      const bankContract = new ethers.Contract("0x9A676e781A523b5d0C0e43731313A708CB607508", bankArtifact.abi)
       setBankContract(bankContract)
       getUsdtContract(bankContract, provider);
     }
     init();
   }, [])
 
-  console.log(bankContract);
   const isConnected = () => (signer !== undefined)
   
-  const clickcreate = function () {
-    setshowCreate(true);
-  }
   const getSigner = async provider => {
     provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
@@ -61,7 +57,7 @@ function App() {
     getSigner(provider)
       .then(signer => {
         setSigner(signer)
-      })
+      });
     
   }
 
@@ -74,13 +70,16 @@ function App() {
   const getAllAccount = useCallback(
     async function () {
       const allAcc = await bankContract.connect(signer).userAccounts();
-      console.log(allAcc)
       setAccount(allAcc);
       connect();
       return allAcc;
     },
     [bankContract, signer]
   );
+  
+  const clickcreate = function () {
+    setshowCreate(true);
+  }
 
   const displayModal = (account, balance) => {
     setSelectedAccount(account)
@@ -103,7 +102,6 @@ function App() {
       })
       
     const accarr = modAcc;
-    console.log(accarr);
     const html = accarr.map(acc => {
 
         return(

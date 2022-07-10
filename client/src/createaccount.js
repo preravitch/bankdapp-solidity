@@ -25,9 +25,9 @@ const CreateAccount = function (props) {
             <label className="modal-title"> Create New Account</label>
         </div>
         <div className='modal-body'>
-          <form>
+          <form onSubmit={submitHandler}>
             <label >Account Name</label>
-            <input  type='text' ref={accountRef} value={value}  onChange={handleChange}/>
+            <input  type='text' ref={accountRef} value={value} onChange={handleChange}/>
           </form>
         </div>
         <div className="modal-footer">

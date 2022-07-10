@@ -13,7 +13,7 @@ contract Bank {
 
     constructor() {
     owner = msg.sender;
-  }
+    }
     function getUsdtAddress(address _UsdtAddress) external {
         require(msg.sender == owner, "No Permission");
         Usdt = _UsdtAddress;
@@ -31,6 +31,19 @@ contract Bank {
 
     BankAccont[] public Accounts;
 
+    
+    function compareStringsbyBytes(string memory s1, string memory s2) public pure returns(bool){
+    return keccak256(abi.encodePacked(s1)) == keccak256(abi.encodePacked(s2));
+    }
+    function createnewaccount(string memory _accountname) public {
+        for (uint i = 0; i <Accounts.length; i++) {
+            require(compareStringsbyBytes(Accounts[i].name,_accountname), "account name had been used");
+        }
+        BankAccont memory newAccount = BankAccont (_accountname, 0, msg.sender);
+        Accounts.push(newAccount);
+        emit showname(newAccount.name, msg.sender);
+    }
+
     function userAccounts() public view returns (BankAccont[] memory) {
         BankAccont[] memory userdetail = new BankAccont[](Accounts.length);
         uint count = 0;
@@ -45,26 +58,6 @@ contract Bank {
             temp[j] = userdetail[j];
         }
         return temp;
-    }
-
-    function createnewaccount(string memory _accountname) public {
-        BankAccont memory newAccount = BankAccont (_accountname, 0, msg.sender);
-        Accounts.push(newAccount);
-        emit showname(newAccount.name, msg.sender);
-    }
-
-    function compareStringsbyBytes(string memory s1, string memory s2) public pure returns(bool){
-    return keccak256(abi.encodePacked(s1)) == keccak256(abi.encodePacked(s2));
-    }
-
-    function getBalance(string memory _accountname) public view returns(uint256) {
-       uint256 balance;
-       for (uint i = 0; i < Accounts.length; i++) {
-            if (compareStringsbyBytes(Accounts[i].name,_accountname)) {
-                balance = Accounts[i].balance;
-            }
-        }
-        return balance;
     }
 
     function depositUsdt(string memory _accountname, uint256 _amount) external {

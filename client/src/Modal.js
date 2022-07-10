@@ -22,7 +22,7 @@ const Modal = props => {
     e.preventDefault();
     const amount = amountRef.current.value
     const wei = toWei(amount)
-    props.deposit(wei, props.account)
+    props.withdraw(wei, props.account)
   };
   if (!props.show) {
     return null

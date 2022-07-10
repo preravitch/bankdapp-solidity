@@ -1,2 +1,3 @@
 # bankdapp-solidity
-first smart contract
+first time ever writing solidity and react
+first time full-stack

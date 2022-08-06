@@ -21,8 +21,9 @@ first time full-stack
 ### Deposit or WithDraw ERC-20 tokens from user's MetaMask wallet
 ![deposit-withdraw](https://user-images.githubusercontent.com/69500548/183234855-f43e0082-b6d8-41bc-88ef-cabfc2e1dfb7.png)
 ### Transfer to another account using the account name
+#### ***When a user executes a token transfer to other accounts that is not yours, deduct 1% of the transferred amount as a platform fee.
 ![transfer](https://user-images.githubusercontent.com/69500548/183234532-4e8a070c-c378-40e6-b2ef-1a57c01033c9.png)
-### List Transfer option to transfer to multiple account at a time
+### List Transfer option to transfer to multiple account at a time through the list of account names
 ![list transfer](https://user-images.githubusercontent.com/69500548/183234528-4350235f-d279-4964-a37a-03a0d51b9bdf.png)
 ### When connect with Another wallet will change data according to user's data in database
 ![change acc](https://user-images.githubusercontent.com/69500548/183234531-ad7f39e3-374c-4e75-808c-ec80bc2cbdff.png)
